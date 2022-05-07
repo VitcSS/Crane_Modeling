@@ -1,0 +1,179 @@
+\documentclass[letterpaper, 10 pt]{ieeeconf}  % Comment this line out
+\usepackage{graphicx}                                                
+% \IEEEoverridecommandlockouts
+% \overrideIEEEmargins
+\usepackage{graphics} % for pdf, bitmapped graphics files
+\usepackage{epsfig} % for postscript graphics files
+\usepackage{mathptmx} % assumes new font selection scheme installed
+\usepackage{times} % assumes new font selection scheme installed
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+
+\title{ Modelagem Inicial do Guindaste usando CoppeliaSim}
+\author{João Victor de Castro Alves\\
+        Juliana Assis Alves\\
+        Pierre Victor da Silva Sousa\\
+        Roberto Pires Oliveira\\
+        Vítor Corrêa Silva\\
+        \\
+        Departamento de Engenharia Elétrica, Universidade Federal de Minas Gerais, Brasil\\
+        Curso de Engenharia de Sistemas}
+
+
+
+
+\begin{document}
+
+\maketitle
+
+\section{Introdução}
+
+    Nesse trabalho iremos modelar a versão básica do guindaste com leves modificações 
+    no software CoppeliaSim. Isso tem como objetivo  não só comprovar o entendimento do grupo 
+    sobre o software e a tarefa mas também consolidar os conhecimentos adquiridos tendo em vista 
+    que o projeto modelado deverá ser implementado em sua forma física.
+    
+\section{Definição do Problema}
+    O primeiro passo para desenvolver o modelo é estabelecer quais são as diretivas que iram 
+    guiar nosso design. Tendo em vista que nenhuma restrição de dimensão ou design foi diretamente feita pelo 
+    professor, iremos usar somente as carcteristicas do problema que o modelo deve solucionar.
+
+    A definição formal do nosso problema pode ser escrita como :
+
+    \begin{center}
+        "O guindaste deve ser capaz de pegar uma moeda de 50 centavos a uma altura de 7mm e 150mm de 
+        distância do guindaste levar essa moeda até uma base, também a 150mm de distância e com uma 
+        altura de até 220mm."
+    \end{center}
+
+\section{Modelagem das peças}   
+    Utilizando somente essas definições é possível já extrair algumas das medidas físicas que nosso 
+    guindaste deve ter. Permitindo assim a criação de um modelo suficientemente satisfatório. Sendo 
+    assim é possível escrever essas definições da seguinte forma :
+
+    \begin{itemize}
+        \item A altura da torre deve exceder \(220mm\).
+        \item O comprimento da lança deve ser, no mínimo, \(150mm\).
+        \item O atuador deve ser capaz de acoplar e manter acoplado por tempo indeterminado um objeto metálico de \(8g\).
+    \end{itemize}
+    \subsection{Base}
+        A base é responsável por garantir a estabilidade de toda a estrutura do guindaste. Temos que garantir 
+        que a base tenha tamanho e peso suficiente para garantir que o guindaste não caia, estando ele 
+        carregado ou não. Portanto a peça que será usada terá as seguintes caractéristicas :
+        \begin{itemize}
+            \item Tipo : Cuboid
+            \item Dimensões : \(70mm\) x \(70mm\) x \(20mm\)
+            \item Massa : \(200g\)
+        \end{itemize}
+    \subsection{Torre}
+        A Torre precisa atender a restrição de altura tendo uma nível razoável de "folga", e ainda sendo factível 
+        que esta torre consiga carregar a Lança estando ou não em movimento. Portanto a peça que será usada terá 
+        as seguintes caractéristicas :
+        \begin{itemize}
+            \item Tipo : Cuboid
+            \item Dimensões : \(50mm\) x \(50mm\) x \(300mm\)
+            \item Massa : \(450g\)
+        \end{itemize}
+    \subsection{Lança}
+        A lança é responsável por mover atuador até a posição alvo e deve ser capaz de aguentar tanto o 
+        peso da carga quanto da estrutura do atuador
+        \begin{itemize}
+            \item Tipo : Cuboid
+            \item Dimensões : \(250mm\) x \(30mm\) x \(15mm\)
+            \item Massa : \(200g\)
+        \end{itemize}
+    \subsection{Contrapeso}
+        O contrapeso tem a função de evitar o desequilíbrio da Lança e garantir que o guindaste 
+        não tombe mesmo com o peso da carga. 
+        \begin{itemize}
+            \item Tipo : Cuboid
+            \item Dimensões : \(30mm\) x \(30mm\) x \(30mm\)
+            \item Massa : \(120g\)
+        \end{itemize}
+    \subsection{Atuador}
+        O atuador usado será feito de forma customizada no software de forma que sua geometria é de 
+        escolha livre. A geometria escolhida será a de um pequeno cilindro, buscando mimetizar a peça 
+        utilizada na versão física a ser construída. Portanto :
+        \begin{itemize}
+            \item Tipo : Cylinder
+            \item Dimensões : \(30mm\) x \(30mm\) x \(60mm\)
+            \item Massa : \(300g\)
+        \end{itemize}
+    \subsection{Base do Atuador}
+        Como o atuador será movido tbm horizontamente ele precisará de uma base própria que terá as seguintes caracteristicas:
+        \begin{itemize}
+            \item Tipo : Cuboid
+            \item Dimensões : \(30mm\) x \(30mm\) x \(30mm\)
+            \item Massa : \(30g\)
+        \end{itemize}
+    \section{Sensoriamento}
+        Para ser possível ter o set completo de funcionalidades visando controle estável do guindaste será adicionado
+        sensoriamento especificamento dois tipos de sensores :
+        \subsection{Sensor de Distância}
+            Será usado um sensor de distância, especificamente do tipo raio, para calcular a distância entre o atuador 
+            e tudo que está logo abaixo. As caracteristicas de configuração podem ser vistas abaixo :
+            \begin{itemize}
+                \item Tipo : Ray
+                \item OffSet = \(5mm\)
+                \item Distância Máxima = \(250mm\)
+            \end{itemize}
+        \subsection{Sensor de Visão}
+            O sensor de visão usado será o de perspectiva , visando garantir certo grau de noção de profundidade. Para isso será usada uma distância mínima de \(3mm\)
+            e uma distância máxima de \(300mm\) e uma resolução de \(1080\) x \(720\). As configurações podem ser vistas a seguir:
+            \begin{itemize}
+                \item Render Mode : OpenGL 
+                \item Near Clipping : \(3mm\)
+                \item Far Clipping : \(300mm\)
+                \item Persp. angle : \(60^{\circ}\)
+            \end{itemize}
+        
+    \section{Juntas}
+        Juntas são objetos que tem o a função de simular movimento de uma estrutura em relação a outra. Esse movimento foi
+        pode ter múltiplos parâmetros definidos porém para a essa iteração da simulação usaremos somente dois. O módulo máximo 
+        de velocidade e o torque máximo.
+        \subsection{Suporte}
+            A junta de suporte tem como objetivo garantir a união da torre a base gerando assim estabilidade para o guindaste. Sua velocidade estará definida como zero e seu torque
+            terá um valor simbólico de 100 N, buscando dar rubustez ao modelo:
+            \begin{itemize}
+                \item \(\left|\vec{V_{max}}\right| = 0\)
+                \item \(T_{max} = 200\)
+            \end{itemize}
+        \subsection{Plano XY}
+            \begin{itemize}
+                \item \(\left|\vec{V_{max}}\right| = 20^{\circ}/S\)
+                \item \(T_{max} = 200\)
+            \end{itemize}
+        \subsection{Eixo Z}
+            \begin{itemize}
+                \item \(\left|\vec{V_{max}}\right| = 6\cdot 10^{-2} m/S\)
+                \item \(T_{max} = 100\)
+            \end{itemize}
+        \subsection{Alinhamento Horizontal}
+            Assim como no vídeo, o guindaste em questão também tera três graus de liberdade portanto é necessário uma junta 
+            prismática para gerar esse movimento. Ela terá as mesmas limitações da junta do Eixo Z.
+            \begin{itemize}
+                \item \(\left|\vec{V_{max}}\right| = 6\cdot 10^{-2} m/S\)
+                \item \(T_{max} = 100\)
+            \end{itemize}
+    \section{API}
+        Todo o controle do modelo será feito via API usando a linguagem Python. Para isso as seguintes classes e métodos foram desenvolvidos. 
+        \subsection{Template}
+
+        \subsection{Juntas}
+
+        \subsubsection{Junta de Revolução}
+
+        \subsubsection{Junta Prismática}
+
+        \subsection{Sensor de Distância}
+
+        \subsection{Sensor de Visão}
+
+        \subsection{Atuador}
+    
+    \section{Conclusão}
+\thispagestyle{empty}
+\pagestyle{empty}
+\end{document}
+
+
