@@ -18,20 +18,3 @@ class Crane :
         self.Actuator = Magnet(Actuator)
         self.Distance = Ray_Sensor(Distance)
 
-class App(customtkinter.CTk):
-    def __init__(self, Model : Crane):
-        self.Model = Model
-        super().__init__()
-
-        # Joints Position Slider
-        XY_Slider = None
-        Z_Slider = None
-        Tool_Slider = None
-
-        # Magnet Button
-        Magnet_Button = None
-
-        # Status Leds
-        Magnet_Status_Led = None
-
-    

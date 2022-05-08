@@ -36,7 +36,7 @@ class joint(object):
 
     # Set the desired position for the joint
     def setPosition(self,pos = 0):
-        self.sim.setJointTargetPosition(pos)
+        self.sim.setJointTargetPosition(self.handle,pos)
         
 # Define class for the prismatic joint for the sake of parity : 
 class Prismatic(joint):
