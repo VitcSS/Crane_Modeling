@@ -20,7 +20,6 @@ class joint(object):
             self.V_min = -V_m
 
     # Get the current position of the joint as property :
-    @property
     def getPosition(self):
         return self.sim.getJointPosition(self.handle)
 
@@ -51,7 +50,7 @@ class Revolute(joint):
 
     def setVelocity(self, Vel=0):
         return super().setVelocity(np.deg2rad(Vel))
-    
+
     def getPosition(self):
         return np.deg2rad(super().getPosition)
     
@@ -97,30 +96,24 @@ class Magnet(object):
         self.F_sensor = object(sensor)
         self.Ray = Ray_Sensor(distance)
 
-    # Catch the closest object if one is in range :
-    def activate(self):
-        if self.is_attached:
-            print('Object already Attached')
-        else: 
-            try:
-                _, load = self.Ray.detect()
-                self.sim.setObjectParent(load,self.F_sensor.handle,True)
-            except :
-                print("No object close enough to magnetize")
-
-    # Drop a object if one is attached : 
-    def deactivate(self):
-        if self.is_attached:
-            load = self.sim.getObjectChild(self.F_sensor,0)
-            self.sim.setObjectParent(load,-1,False)
-        else: 
-            print('No object attached')
-
-    # Check if the magnet has a object attached
-    @property
-    def is_attached(self):
-        if self.sim.getObjectChild(self.F_sensor,0) == -1:
-            return False
-        else:
+    def find(self):
+        try :
+            _,target = self.Ray.detect()
+            return target
+        except :
+            return None
+    def has_something(self):
+        if self.sim.getObjectChild(self.F_sensor.handle,0) != -1: 
             return True
+        else : 
+            return False
+    def on(self):
+        target = self.find()
+        if target != None:
+            self.sim.setObjectParent(target, self.F_sensor.handle, True)
+    
+    def off(self):
+        if self.has_something() == True:
+            self.sim.setObjectParent(self.sim.getObjectChild(self.F_sensor.handle,0),-1,True)
+
 
